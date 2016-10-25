@@ -71,3 +71,14 @@ deploy:
   type: git
   repository: https://github.com/ShiningDan/ShiningDan.github.io
   branch: master
+
+# baidu_analystics
+baidu_analystics: 65f098889042a1740b5cfede967d34b2
+
+
+# add local search
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000

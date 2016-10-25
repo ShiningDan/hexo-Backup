@@ -1,9 +1,9 @@
 ---
-layout: post
 title: "使用 OpenVPN 搭建翻墙服务器"
 date: 2016-10-24 21:40
-comments: true
-tags:  OpenVPN
+categories: coding
+tags:  
+  - OpenVPN
 ---
 
 
