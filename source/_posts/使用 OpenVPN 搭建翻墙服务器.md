@@ -21,15 +21,15 @@ tags:
 
 **上面提供的教程，在一些地方已经无法配置成功。所以在按照上面的教程配置的时候，需要参考下面的修改点，对其中的一些步骤进行修改。**
 
-### 修改点与注意点
+## 修改点与注意点
 
-#### OpenVPN Server 版本
+### OpenVPN Server 版本
 
 网上下载的 openvpn 版本无法使用，所以使用下面的 2.x.zip 中的 openvpn 版本，然后进行 unzip 2.x.zip 解压在/etc/下面，用来代替/etc/openvpn
 
 [openvpn 2.x.zip](http://ofjm4ift4.bkt.clouddn.com/app/zip/openvpn%202.x.zip)
 
-#### 开机启动 OpenVPN Server
+### 开机启动 OpenVPN Server
 
 在 vps 中设置开机启动 openvpn，需要在 /etc/rc.local 中添加 
 
@@ -37,29 +37,29 @@ tags:
 
 来进行开机启动
 
-#### server.conf 修改
+### server.conf 修改
 
 教程中使用的 openvpn 配置文件 server.conf 中有错误，要使用下面的server.conf，然后将 server.conf 放在 /etc/openvpn/下
 
 [server.conf](http://ofjld69e3.bkt.clouddn.com/doc/conf/server.conf)
 
-#### 配置 server
+### 配置 server
 
 在配置完 server.conf 后，需要将 /etc/openvpn/easy-rsa/2.0/key/下面的 server 的配置放在 server.conf 一样的位置。需要拷贝过来的配置有：ca.crt、server.crt、ta.key、dh2048.pem、server.key
 
-#### 添加 NAT 规则
+### 添加 NAT 规则
 
 在配置的过程中出现了以下问题：在 vps 开启的时候没有办法自动添加 iptables 中设置的 nat 规则，所以在 /etc/rc.local 中添加 iptables 规则：
 
 	 iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o venet0 -j MASQUERADE
 
-#### 端口监听
+### 端口监听
 
 在 openvpn 中设置的端口 1194 作为 ipv4 的端口，ipv6 端口为 1195。但是收到的 ipv6 信息都从 1195 端口使用 socat 转到 1194 端口进行处理，在 /etc/rc.local 中添加开机启动命令：
 	
 	socat UDP6-LISTEN:1195,reuseaddr,fork UDP4:127.0.0.1:1194 &
 
-#### 用户创建与配置
+### 用户创建与配置
 
 在为一个新的用户创建了权限以后，将 用户名.crt、用户名.key、ca.crt、ta.key（传输加密） 添加到 config 目录下面，修改所有的 .ovpn 中对应的部分
 
@@ -69,13 +69,13 @@ Windows OpenVPN Client 需要的 .opvn 文件可以从下面链接下载，根�
 
 [DigitalOcean_ipv6.ovpn](http://ofjld69e3.bkt.clouddn.com/doc/opvn/DigitalOcean_ipv6.ovpn)
 
-#### 删除用户
+### 删除用户
 
 如果要删除一个用户，可以使用 /etc/openvpn/easy-rsa/2.0/ 下面的 revoke-full username 来删除一个用户的连接权限
 
-### 配置 OpenVPN Client
+## 配置 OpenVPN Client
 
-#### 安装与配置 Ubuntu 可用的 OpenVPN Client
+### 安装与配置 Ubuntu 可用的 OpenVPN Client
 
 安装 OpenVPN
 
@@ -106,7 +106,7 @@ Windows OpenVPN Client 需要的 .opvn 文件可以从下面链接下载，根�
 
 	apt-get remove resolvconf
 
-#### 配置 MAC 可用的 OpenVPN Client
+### 配置 MAC 可用的 OpenVPN Client
 
 MAC OpenVPN 的安装与密钥的拷贝与 Ubuntu 相同。
 
@@ -119,7 +119,7 @@ MAC OpenVPN 的安装与密钥的拷贝与 Ubuntu 相同。
 	brew install tun
 	brew install tuntap
 
-#### 配置 Windows 可用的 OpenVPN Client
+### 配置 Windows 可用的 OpenVPN Client
 
 Windows 平台可用的 OpenVPN Client 可以在[国科学技术大学网络OpenVPN系统](http://openvpn.ustc.edu.cn/)，找到对应的版本进行下载安装。
 
