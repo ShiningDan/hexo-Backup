@@ -23,6 +23,8 @@ tags:
 
 ## 修改点与注意点
 
+<!--more-->
+
 ### OpenVPN Server 版本
 
 网上下载的 openvpn 版本无法使用，所以使用下面的 2.x.zip 中的 openvpn 版本，然后进行 unzip 2.x.zip 解压在/etc/下面，用来代替/etc/openvpn
