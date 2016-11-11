@@ -6,8 +6,6 @@ tags:
   - CSS
 ---
 
-# CSS 属性深入理解
-
 **在这个属性中，会对一些 CSS 进行深入的介绍。**
 
 ## CSS 深入理解之 float
@@ -18,8 +16,8 @@ tags:
 
 ### float 的行为特点
 
-<!--more-->
 
+<!--more-->
 #### 包裹性
 
 **BFC(Block Formatting Context)：块级格式化上下文**：具有 BFC 特点的元素块，将有一下特性：
@@ -248,9 +246,149 @@ position:absolute 的元素也具有包裹性，包裹性的性质可以查看 f
 
 使用 position:absolute 的时候，一般是与 top left right bottom 等属性配合，相对于 relative 元素进行定位。不过，如果使用 position:absolute 与 margin 的配合，实现精确定位，这样的可扩展性更好。
 
+**因为使用 top、right、left、bottom 属性设置定位位置，位置不会随着页面大小的变化而自动改变，自适应性不大好。除非使用 js 来根据网页的 height 和 width 来自动调整位置。**
+
+如果绝对定位的位置设置同时使用了对立的元素如： top 和 bottom 同时使用，left 和 right 同时使用，则会导致元素的 height 或 width 的拉伸或压缩的效果。(IE7+ 的浏览器支持) 如果 height/width 和 left/right/top/bottom 同时存在，则 height/width 的显示优先级较高。
+
+
 ### 绝对定位与动画
 
 **因为绝对定位的标签脱离了文档流，所以动画尽量作用在绝对定位的元素上，这样不会对正常的文档流显示造成影响。**
+
+## CSS 深入理解之 overflow
+
+overflow 的基本属性
+
+1. visible：默认值，超出范围的部分仍旧会显示
+2. hidden：超出的部分会被隐藏
+3. scroll：超出的部分会自动添加滚动条，如果没有超出，也会添加滚动条，不过滚动条不可选
+4. auto：如果内容超出，则会自动添加滚动条，如果内容不超出，则不会添加滚动条。
+5. inherit：从父元素继承
+
+overflow-x 和 overflow-y 这两个属性会控制一个方向上的溢出表现。如果 overflow-x 和 overflow-y 的值相同，则效果等同于 overflow；如果值不相同，且其中一个值为 visible，而另一个值是 hidden/scroll/auto，则 visible 会被重置为 auto。
+
+ ### overflow 与滚动条
+
+**无论什么浏览器，默认滚动条来自 html 标签，而不是 body 标签( body 标签默认有 0.5em 的 margin 值)。**所以，如果想去掉页面默认的滚动条，可以使用
+
+	html { overflow: hidden}
+
+在 chrome 中，滚动条的高度是：
+
+	document.body.scorllTop
+
+在其他浏览器中，滚动条的高度是：
+
+	document.documentElement.scrollTop
+
+所以，跨浏览器的获得滚动高度的方法是：
+
+	var st = document.body.scrollTop || document.documentElement.scrollTop;
+
+***滚动条的自定义样式：**
+
+1. -webkit：webkit 内核的 CSS 属性为：-webkit-scrollbar 等一系列，可以自行学习
+2. IE：scrollbar 一系列属性
+3. jq 也有自定义滚动条的插件 [github地址](https://github.com/malihu/malihu-custom-scrollbar-plugin)
+
+### overflow 与 BFC
+
+**BFC(Block Formatting Context)：块级格式化上下文**
+
+设置了非 overflow:visible 的元素，会转换为 BFC 布局方法，使用 BFC 布局方法的时候，一定要注意不要和流体布局 float 相互影响。
+
+overflow 与 BFC 的应用一般分为三种：1. 清除浮动 2. 避免 margin 穿透问题 3. 两栏自适应布局
+
+#### 清除浮动
+
+overflow:visible 无法清除浮动，而 scroll auto hidden 可以。
+
+但是 overflow:hidden 会让超出块的元素不可见，所以更通用的写法为：
+
+	.clearfix {*zoom:1;}
+	.clearfix:after {conten:''; display:table; clear:both;}
+
+
+### overflow 与绝对定位
+
+如果一个元素添加了 overflow:hidden 和 position:absolute，则 overflow:hidden 的隐藏效果会失效。
+
+![](http://ofjjubwp5.bkt.clouddn.com/image/png/img40.PNG)
+	
+	<html>
+	    <head>
+	        <title>test</title>
+	    </head>
+	    <body>
+	        <div style="width: 200px; height: 200px; overflow: hidden; border: 2px solid #000;">
+	            <img style="width: 300px; height: 300px; position: absolute" src="http://ofjjubwp5.bkt.clouddn.com/image/jpg/avatar.jpg" alt="">
+	        </div>
+	    </body>
+	</html>
+
+同样 position:absolute 也会让 overflow:auto 的滚动失效。
+
+
+
+**失效原因**：绝对定位元素不总是被父级 overflow 属性剪裁，尤其 overflow 在绝度定位元素及其包含快之间的时候。
+
+**避免方法**：
+
+**包含块**：含有 position:relative/absolute/fixed 声明的父级元素，没有则为 body 元素
+
+1.  overflow 元素自身为包含块(例如给该元素添加 position:relative 的属性)
+2.  overlfow 元素的子元素为包含块
+
+### 依赖 overflow 的样式表现
+
+#### resize 属性
+
+CSS3 的 resize 属性，可以**支持元素的尺寸被鼠标拉伸**，例如 resize:both、resize:horizontal、resize:vertical。但是想要实现 resize 的作用，元素的 overflow 不能设置为 visible。
+
+#### ellipsis 文字溢出使用省略号表示
+
+text-overflow: ellipsis 的意思是，溢出的文本使用省略号表示。但是这个属性有效果，需要设置 overflow:hidden
+
+### overflow 与锚点技术
+
+使用**锚点定位技术(url 后面的 # 跟着页面上元素的 id，点击 url 可以跳到该 id 所在的元素)**，需要容器可滚动，而且锚点元素(id 对应的元素) 在容器内。
+
+ **锚点定位的本质是**：改变容器的滚动高度(scrollTop 高度的改变)
+
+#### 锚点定位的作用
+
+1. 快速定位，例如立刻定位到用户评论
+2. 锚点定位与 overflow 选项卡技术：通过 a 标签的 href，定位到该 id 对应在页面的元素，具体可以查看 overflow 选项卡实现。
+
+		<html>
+		    <head>
+		        <title>test</title>
+		    </head>
+		    <body>
+		        <div class="box">
+		            <div class="list" id="one">1</div>
+		            <div class="list" id="two">2</div>
+		            <div class="list" id="three">3</div>
+		            <div class="list" id="four">4</div>
+		        </div>
+		        <div class="link">
+		            <a class="click" href="#one">1</a>
+		            <a class="click" href="#two">2</a>
+		            <a class="click" href="#three">3</a>
+		            <a class="click" href="#four">4</a>
+		        </div>
+		    </body>
+		</html>
+
+
+
+
+
+
+
+
+
+
 
 
 
