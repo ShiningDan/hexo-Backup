@@ -6,7 +6,7 @@ tags:
   - CSS
 ---
 
-本系列的只是是参考[慕课网 张鑫旭](http://www.imooc.com/u/197450/courses?sort=publish)老师的视频，仅供个人查阅使用，具体讲解推荐参考视频。
+本系列的是参考[慕课网 张鑫旭](http://www.imooc.com/u/197450/courses?sort=publish)老师的视频，仅供个人查阅使用，具体讲解推荐参考视频。
 
 **在这个属性中，会对一些 CSS 进行深入的介绍。**
 
