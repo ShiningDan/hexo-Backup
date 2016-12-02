@@ -52,6 +52,10 @@ NodeList 对象不是某一个时间保存下来的快照，DOM 的变化能自�
 
 **document.body**指向的是`<body>`元素
 
+**document.compatMode**告诉开发人员浏览器使用的是什么渲染模式，如果是 `CSS1Compat`，就是标准模式，如果是 `BackCompat`，就是混杂模式
+
+DOM3 中添加了遍历元素 DOM 结构的函数，分别是 `document.createNoeIterator` 和 `document.createTreeWalker`
+
 **查找元素的方法：**
 
 1. getElementById
@@ -65,6 +69,14 @@ Node类型的元素，即node.nodeType == 1 为 true 的元素，**nodeName**的
 
 **tagName**的返回值都是大写的，如"DIV"
 
+**innerHTML、outerHTML或者 insertAdjacentHTML()** 使用的注意点：
+
+1. 在删除带有事件处理或者引用了其他 JavaScript 对象子树时，会出现元素与处理程序之间的绑定关系依旧存在，页面占用的内存就会显著增加。所以为了提高性能，需要手工删除被替换的元素所有的事件处理程序和 JavaScript 对象属性
+2. 在插入大量的 HTML 元素时，使用 innerHTML 属性与多次创建 DOM 节点然后再指定关系，**效率高得多**，因为使用 innerHTML 和 outerHTML 会创建一个解析器，这个解析器是浏览器级别的代码(通常是 C++)，所以执行速度快得多。
+
+**childNodes 与 children** 之间的差异：`children` 属性返回的是元素中还是元素的节点， `childNodes`除了元素节点以外，还会返回文本、注释等节点。
+
+
 与特性相关的函数是：`getAttribute()、setAttribute()、removeAttribute()`，自定义的特性应该加上 `data-` 前缀以便验证。
 
 **attributes**属性经常用于遍历元素的属性，返回值是 NamedNodeMap，与 NodeList 类似。
@@ -77,11 +89,81 @@ Node类型的元素，即node.nodeType == 1 为 true 的元素，**nodeName**的
 1. getElementsByTagName
 2. getElementsByClassName
 
+#### 元素的大小
+
+`offsetTop、offsetLeft`表示的是元素左(上)外框到包含元素的左(上)内框之间的距离
+
+`offsetHeight、offsetWidth`表示的是元素在垂直(水平)方向上所占用的空间的大小，包括**边框+内边距+内容**
+
+`clientWidth、clientHeight`表示的是元素内容在垂直(水平)方向上所占用的空间的大小，包括**内边距+内容**
+
+`scrollWidth、scrollHeight`表示的是包含滚动隐藏的内容元素在垂直(水平)方向上所占用的空间的大小
+
+`scrollLeft、scrollTop`表示的是被隐藏区域的左(上)部的像素数，通过设置这个值也可以实现滚动位置的重定位。
+
+#### 样式(style)
+
+**如果没有给元素设置 style 的特性， elem.style 对象会包含一些默认的值。style 对象只能返回 HTML 标签中设置的 style 的值(HTML style 特性或者 `<style>` 标签中设置的值)，或者 JavaScript 中为元素的 style 添加的值，使用 `<link>` 标签外链得到的其他层叠样式信息无法得到。**
+
+`document.defaultView.getComputedStyle()` 方法，通过设置参数(第一个是要取得计算的元素，第二个是伪元素的字符串，例如 :after，没有就写 null)，可以过的当前元素所有计算样式。所有的计算样式都是只读的。
+
+`document.styleSheet` 可以获得所有的 `<link>`标签和`<style>`标签中的内容。
+
 ### DocumentFragment
 
 如果我们要更新文档中的结构，如果要逐条修改结构，会导致浏览器反复渲染。为了避免这个问题，可以先创建一个文档片段(document fragment)，**将结构预先修改到文档片段中，最后一并添加到文档内**
 
 	let fragment = document.createDocumentFragment();
+
+### 动态脚本，样式
+
+使用 document.createElement("script")，添加脚本中的内容，最后把标签添加到当前页面中，才能开始下载外部文件。
+
+动态样式也是同样道理。
+
+### querySelector、querySelectorAll
+
+**这两个函数的作用都是使用 CSS 选择符来查找并返回元素，**querySelector 返回匹配的第一个元素，querySelectorAll 返回的是一个 NodeList 实例，得到的是匹配到的所有元素。
+
+### 表单(form)
+
+
+
+### 事件
+
+一般的事件处理使用的事件冒泡(事件从发生元素向 document 元素冒泡)，在特殊情况下使用事件捕获(document 先捕获事件，最后是发生元素捕获事件)
+
+**事件处理函数有一个局部变量 event，通过 event 对象，可以直接访问事件对象，不用自己定义它，也不用从函数的参数列表中读取。在事件处理函数的内部， this 值等于事件的目标元素。**
+
+使用 `event.preventDefault()` 函数可以阻止事件的默认行为，如果事件的处理函数返回值是 false，也可以阻止事件的默认行为。
+
+**有的事件可能会在事件期间被重复触发，所以要注意，类似的事件有：scroll、mousemove、keydown、keypress**
+
+有的键盘事件可能触发鼠标事件，也可能影响鼠标事件的结果。
+
+DOM 结构的改变也会出发相关的事件，详细参考变动事件。
+
+**beforeunload**：事件可以让程序员在页面卸载之前做一些提示用户的动作，但是不能通过这个事件阻止页面的关闭行为。
+
+**如果页面中绑定了过多的事件处理程序**，会直接影响到页面的运行效率，这个时候，可以利用事件的冒泡在高层元素上添加事件处理程序，以减少事件处理程序的数量。
+
+**当使用 removeChild() 方法，或者使用 innerHTML 等方法替换掉带有事件处理程序的元素时，**原来添加到元素中的事件处理程序极有可能无法被当作垃圾回收，所以最好提前移除事件处理程序，如 `btn.onclick = null;`
+
+
+**模拟事件发生**：可以使用 `createEvent`方法创建一个事件，使用`dsipatchEvent`方法来触发这个事件，来模拟事件的发生。
+
+#### DOM0级事件处理程序
+
+	btn.onclick = function(){
+		alter("press!");
+	}
+
+好处是具有跨浏览器的优势。**缺点是使用这种方法，只能给 onclick 赋值一个处理函数，如果再次调用，会覆盖前一个处理函数。**
+
+#### DOM2级事件处理程序
+
+`addEventListener` 和 `removeEventListener` 函数，在 **IE** 下面是 `attachEvent()` 和 `detachEvent()`
+
 
 ## BOM
 
