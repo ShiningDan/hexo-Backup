@@ -127,7 +127,55 @@ Node类型的元素，即node.nodeType == 1 为 true 的元素，**nodeName**的
 
 ### 表单(form)
 
+#### HTMLFormElement
 
+常用的属性有：
+
+* **acceptCharset**：服务器可以接受的字符集
+* **action**：接受请求的 URL
+* **elements**：控件集合
+* **length**：控件数量
+* **method**：http 请求类型，是 post 还是 get
+* reset()：所有表单域重置为默认值(可以触发 reset 事件)
+* submit()：提交表单(这个函数不会触发 submit 事件，所以在调用这个函数之前要先验证表单数据)
+
+#### 提交表单
+
+使用 input[type="submit"] 或者 button[type="submit"] 都可以提交表单。**如果一个提交表单长时间没有反应，用户可能会多次点击提交按钮，结果可能很麻烦，所以在第一次提交表单以后，可以禁用提交按钮(`btn.disable = true`)，或者利用 onsubmit 函数取消后续的表单提交动作。**
+
+#### 表单事件
+
+表单常用的事件有：
+
+* `onclick`：点击的时候
+* `onmouseout`：当鼠标移出的时候
+* `onmouseover`：当鼠标移入的时候
+* `onfocus`：控件获得焦点
+* `onblur`：控件失去焦点
+
+#### 表单约束
+
+可以在每个文本框填写完成以后，对表单填写的内容进行验证，除此以外，HTML5 还对表单的自动验证提供了一些支持，比如有：
+
+* **required**：必填
+* **type="url"、"email"**：多种输入类型
+* **type="number"、"range"、"datetime"、"datetime-local"、"date"、"month"、"week"、"time"等 **：多种输入类型，不过浏览器对这几个类型的支持情况不好
+* **pattern**：在 HTML 中添加正则表达式进行验证
+
+#### 表单序列化
+
+**表单序列化**解决的是如何向服务器传输表单获得的数据，一般有以下要求：
+
+* 对表单字段的名称和值进行 URL 编码，使用(`&`)符号进行分割
+* 不发送禁用的表单字段
+* 只发送勾选的单选框和复选框按钮
+* 不发送 type 为 reset 或 button 的按钮
+* 多选框中每一个选中的值单独一个条目
+* `<select>`元素的值，就是选中的`<option>`的 value 值，如果没有 value，就是 `<option>`的文本值
+
+#### 富文本编辑
+
+**富文本编辑**允许在网页中编辑富文本内容。
 
 ### 事件
 
@@ -136,6 +184,8 @@ Node类型的元素，即node.nodeType == 1 为 true 的元素，**nodeName**的
 **事件处理函数有一个局部变量 event，通过 event 对象，可以直接访问事件对象，不用自己定义它，也不用从函数的参数列表中读取。在事件处理函数的内部， this 值等于事件的目标元素。**
 
 使用 `event.preventDefault()` 函数可以阻止事件的默认行为，如果事件的处理函数返回值是 false，也可以阻止事件的默认行为。
+
+**JavaScript 支持自定义事件，事件是观察者的设计模式。**
 
 **有的事件可能会在事件期间被重复触发，所以要注意，类似的事件有：scroll、mousemove、keydown、keypress**
 
@@ -149,6 +199,7 @@ DOM 结构的改变也会出发相关的事件，详细参考变动事件。
 
 **当使用 removeChild() 方法，或者使用 innerHTML 等方法替换掉带有事件处理程序的元素时，**原来添加到元素中的事件处理程序极有可能无法被当作垃圾回收，所以最好提前移除事件处理程序，如 `btn.onclick = null;`
 
+`HTML5` 支持了一些和拖放相关的事件，比如`dragstart、drag、dragend`等
 
 **模拟事件发生**：可以使用 `createEvent`方法创建一个事件，使用`dsipatchEvent`方法来触发这个事件，来模拟事件的发生。
 
@@ -163,7 +214,6 @@ DOM 结构的改变也会出发相关的事件，详细参考变动事件。
 #### DOM2级事件处理程序
 
 `addEventListener` 和 `removeEventListener` 函数，在 **IE** 下面是 `attachEvent()` 和 `detachEvent()`
-
 
 ## BOM
 
@@ -189,6 +239,33 @@ BOM 提供的相关功能如下：
 1. 确定按键：alter()
 2. 确定、取消按键：confirm()
 3. 提示用户输入文本：prompt()
+
+### 离线应用与客户端存储
+
+#### 离线检测
+
+navigator.onLine 可以判断是否离线，并且还有 online 和 offline 两个事件
+
+#### 应用缓存
+
+appcache 是用来开发离线 WEB 应用而设计的，本质上是从浏览器缓存中分出来一块缓存区，如果要使用这个缓存区，可以使用一个描述文件(manifest file)，写出要下载和缓存的资源。
+
+#### Cookie
+
+用来在客户端存储会话信息和数据，一般每个域名的 cookie 属性有限制，浏览器的 cookie 总大小也有所限制。
+
+**cookie 中任何数据都可以被他人访问，所以不要在 cookie 中存储隐私数据**
+
+#### Web Storage(Web 存储)
+
+**在 chrome 调试中，对应的是本地存储这一项。**
+
+存储大量可跨越会话存在的数据的机制
+
+#### indexDB
+
+**在浏览器中保存结构化数据的一种数据库**
+
 
 ## 元素标签
 
@@ -318,6 +395,16 @@ ECMAScript 中有 **5 种简单的数据类型(基本数据类型)：Undefined�
 **constractor**保存的是用于创建当前对象的函数，在一定程度上可以用来判断数据类型，但是不推荐。
 
 **如果想要检测对象的类型，使用 instanceof 操作符**
+
+##### 安全的类型检测
+
+	var isArray = value instanceof Array;
+
+一般对 Object 类型使用 instanceof 操作符进行类型检测，**但是如果 value 和 Array 不在同一个全局作用域中的时候，比如 value 是在另一个 frame 中定义的数组，此时返回值就是 false**，所以我们推荐使用 Object.prototype.toString() 方法来检测**原生的**对象。尤其是 JSON 对象，很多人使用第三方的 JSON 库，所以很难确定页面中的 JSON 是否是原生的。
+
+	function isArray(value){
+		return Object.prototype.toString.call(value) == "[object Array]";
+		}
 
 ##### Array
 
@@ -484,9 +571,24 @@ arguments 和函数参数的内存空间不同，但是他们的值会同步，�
 
 **在 JavaScript 中，花括号所包裹的范围没有自己的作用域(执行环境)**
 
+#### 惰性载入函数
+
+**一般用在多浏览器兼容处理上，会对浏览器所支持的能力进行检查，然后在决定如何对函数的行为进行赋值。《JavaScript 高级程序设计》P600**
+
+#### 函数绑定
+
+ECMAScript 5 为函数定义了一个 bind() 方法，可以在函数上调用，用来指定某个对象作为函数运行时的 this 对象，类似于 call() 和 apply() 。不过 bind() 函数的返回值有一些不同，它返回设置好 this 的函数变量，当需要的时候，再设置参数。
+
+#### 函数柯里化
+
+**用于创建已经设置好一个或多个参数的函数，有指定作用域**
+
+**函数绑定和函数柯里化都会带来额外的开销，不应该滥用。**
+
 #### 内存管理
 
 JavaScript 具有自动的内存管理机制，但是为了确保占用最少的内存，就需要对数据进行处理。**当数据不再使用的时候，最好将其设置为 null，这样内存处理机制就会将其释放**
+
 
 ### ECMAscript 内置对象
 
@@ -514,6 +616,28 @@ encodeURI() 主要用于整个 URI，而 encodeURIComponent() 主要用于 URI �
 3. [[get]]：读取属性时调用的函数，默认是 undefined
 4. [[set]]：写入属性时调用的函数，默认是 undefined
 
+#### 防篡改对象
+
+**一旦把对象设定为防篡改，就无法撤销了。**
+
+##### 不可扩展对象
+
+	Object.preventExtension(arg);
+
+设置后，无法给 arg 对象添加属性和方法
+
+##### 密封的对象
+
+	Object.seal(arg);
+
+设置后，arg 对象无法扩展，也无法删除属性和方法。
+
+##### 冻结的对象
+
+	Object.freeze(arg);
+
+设置后，arg 独享无法扩展，又是密封的，并且对象属性不能被修改。
+
 #### 原型链
 
 **在构造函数中， prototype指向的是构造函数的原型，当通过构造函数生成一个对象以后，对象拥有的属性是 `__proto__` ，prototype 在原型链中起到的是一个辅助作用，用来将原型赋值给 `__proto__`，而`__proto__`代表了原型链的本质。**
@@ -522,6 +646,254 @@ encodeURI() 主要用于整个 URI，而 encodeURIComponent() 主要用于 URI �
 
 为了向超类的构造函数中传递数据，要使用 call() 或者 apply() 方法来传递参数，设置运行环境。
 
+##### 作用域安全的构造函数
+
+如果构造函数如下定义：
+
+	function Person(name, age){
+		this.name = name;
+		this age = age;
+	}
+
+**当没有使用 new 操作符调用该构造函数的情况下，没有为这个对象创建新的对象，此时 this 对象会绑定到 window 对象上，导致错误。**
+
+所以要判断 this 对象的类型：
+
+	function Person(name, age){
+		if(this instanceof Person){
+			this.name = name;
+			this.age = age;
+		} else{
+			return new Person(name, age);
+		}
+	}
+
+**但是这种方法进行继承的时候，如果没有使用原型链，可能会破坏继承，见《JavaScript 高级程序设计》P599**
+
+### 数据交互
+
+#### 跨文档数据交互
+
+**跨文档信息传送(cross-document messaging)**：简称 `XDM`，指的是来自不同域的页面相互之间传递消息。核心方法是 `postMessage`，会触发 `message` 事件。一般发送的对象是当前页面中的 `<iframe>`，或者当前页面弹出的窗口。
+
+#### AJAX
+
+使用 `XMLHttpRequest` 对象，能够以异步的方式从服务器获得更多的信息，然后通过 DOM 将数据插入到页面中。
+
+**只能向同一个域中使用相同端口和协议的 URL 发送请求，否则会引发安全错误(无法跨域)。同时，请求的对方必须运行在一个服务器上，因为 XHR 只支持 http、https、data 等协议，不支持本地以文件形式打开**
+
+##### `GET`方法
+
+有关 GET 请求的其他一些注释：
+* GET 请求可被缓存
+* GET 请求保留在浏览器历史记录中
+* GET 请求可被收藏为书签
+* GET 请求不应在处理敏感数据时使用
+* GET 请求有长度限制
+* GET 请求只应当用于取回数据
+
+##### `POST`方法
+
+有关 POST 请求的其他一些注释：
+* POST 请求不会被缓存
+* POST 请求不会保留在浏览器历史记录中
+* POST 不能被收藏为书签
+* POST 请求对数据长度没有要求
+
+##### POST&GET 比较
+
+[w3school 上有 POST 和 GET 的对比](http://www.w3school.com.cn/tags/html_ref_httpmethods.asp)
+
+与 POST 相比，GET 更简单也更快，并且在大部分情况下都能用。
+
+然而，在以下情况中，请使用 POST 请求：
+
+* 无法使用缓存文件（更新服务器上的文件或数据库）
+* 向服务器发送大量数据（POST 没有数据量限制）
+* 发送包含未知字符的用户输入时，POST 比 GET 更稳定也更可靠
+
+虽然 `XMLHttpRequest` 也支持使用同步的方法进行数据的请求，但是使用同步的方法进行数据的请求**已经要被标准废除了**，因为会影响用户的体验。
+
+##### FormData
+
+`FormData` 对象用来进行表单的序列化
+
+##### 超时设定
+
+XHR 对象有一个 timeout 属性，表示请求在等待相应多少毫秒后终止。
+
+##### XHR 事件
+
+目前有 6 个事件绑定在 XHR 上用来处理请求发生的相关状况：`loadstart、progress、error、abort、load、loadned`
+
+#### 图像 ping
+
+**图像 ping 可以跨域**，原理是使用 `<img>`标签，在 src 属性中添加请求的链接。因为网页可以从任何网页中加载图像，所以可以跨域。
+
+**缺点是**：
+
+1. 只能发送 GET 请求
+2. 无法访问服务器的响应文本，只能用于浏览器与服务器之间的单向通讯
+
+####  JSONP
+
+JSONP(JSON with padding)，填充式 JSON 或者 参数式 JSON，是 JSON 的新用法。**JSONP 可以跨域，支持浏览器与服务器的双向通讯**
+
+方法是：创建处理响应到来时的回调函数，然后通过动态`<script>`标签，为 src 属性执行跨域的 URL。
+
+#### Comet
+
+**Comet 是一种服务器向页面推送数据的技术，通常用于数据经常更新的场景，比如股票报价，体育文字直播等。**实现方法有长轮询和 HTTP 流。
+
+**SSE(Server-Sent Event)**：服务器发送事件，是围绕只读 Comet 交互推出的 API。使用 XHR 和 SSE 配合能实现双向通信。
+
+#### Web Sockets
+
+**在单独，持久连接上提供全双工，双向通信。**当创建了 Web Socket 之后，会发出一个 HTTP 请求，当获得的服务器的响应了以后，会从 HTTP 协议变成 Web Socket 协议(ws:// 或者加密的 wss://)
+
+Web Socket 不支持 DOM 2 级事件监听，只能使用 DOM0 语法定义事件处理程序。
+
+**想要使用 Web Socket，需要有 Web Socket 服务器**
+
+### 异常处理
+
+**一般在页面中的 JavaScript 发生错误会导致下面的脚本无法继续执行，影响用户的体验，所以要在合适的地方加上异常处理程序。**
+
+	function test(){
+		try{
+			return 0;
+		} catch(error) {
+			return 1;
+		} finally{
+			return 2;
+		}
+	}
+
+如果执行这条函数，我们可以看到，无论 try 和 catch 中包含什么样的语句，甚至是 return 语句，都不会阻止 finally 语句的执行，最后函数的**返回结果是 2**。**只要代码中包含 finally 子句，则无论 try 还是 catch 中的语句块的 return 都会被忽略，这一点需要注意。**
+
+可以使用 `throw` 操作符主动抛出一个错误，然后终止代码，`throw`的值没有类型的限制。
+
+	throw 1;
+	throw "11";
+	throw true;
+	throw {name:"JavaScript"};
+
+**一般需要关注的错误有：**
+
+1. 类型转换错误
+2. 数据类型错误
+3. 通信错误
+
+### JavaScript 与 XML
+
+**将字符串解析为 DOM**：
+
+	var parser = new DOMParser();
+	var xmldom = parser.parseFromString(str);
+
+**将 DOM 文档序列化为字符串：**
+
+	var serializer = new XMLSerializer();
+	var xml = serializer.serializerToString(xmldom);
+
+
+**Xpath**是用来在 DOM 文档中查找节点的一种手段。
+
+####  E4X
+
+`E4X` 指的是 ECMAScript 对于 XML 原生的支持，在 ECMAScript 中创建 XML 对象用来处理 XML，但是很多浏览器对这个扩展标准的支持并不好。
+
+### JSON
+
+`JSON`是 JavaScript 中读写结构化数组的更好的方法，因为可以把 JSON 直接传给 eval()。而且不必创建 DOM 对象。
+
+JSON 支持以下三种类型的值
+
+* **简单值**：可以表示字符串、数值、布尔值、null，**但是没有 undefined**
+* **对象**：表示一组无序的键值对
+* **数组**：表示一组有序的列表
+
+**注意点**：JSON 中的对象需要给所有的属性值加引号，并且同一个对象中不可以出现两个同名的属性。
+
+#### JSON 的序列化和解析
+
+`JSON.stringify()`：将 JavaScript 对象序列化为 JSON 字符串，在进行序列化的时候，可以控制参数，添加一个过滤器，也可以选择是否在 JSON 中保留缩进。还可以定义 toJSON() 函数，来自定义自身返回的 JSON 数据格式。
+
+`JSON.parse()`：把 JSON 字符串解析为 JavaScript 对象，也可以在参数上提供一个函数，来确定如何进行 JavaScript 对象的构造
+
+### 性能优化
+
+#### 避免全局查找
+
+如果作用域嵌套很深或者作用域的数量很多，访问当前作用域以外的变量的时间就会增加，导致**访问全局变量比访问局部变量慢，因为需要遍历作用域，特别是 document 对象。**所以，如果函数中使用 document 对象的次数过多，可以创建一个指向 document 对象的局部对象，通过限制全局查找改变函数的性能：`var doc = document;`
+
+#### 避免 with 语句
+
+`with` 语句会创建自己的作用域，导致执行代码的作用域链增加，在 `with`语句内的代码执行要慢。
+
+#### 避免不必要的属性查找
+
+使用变量和数组比访问对象上的属性更有效率，因为对象上的属性查找，都是对原型链的属性进行一次搜索。
+
+多次用到对象属性，应该将其存储到局部变量中。
+
+#### 优化循环
+
+* **减值迭代**：大多数循环从 0 开始，很多情况下，从最大值开始，在循环中不断减值的迭代器更高效
+* **简化终止条件**：由于每次循环都要计算终止条件，所以要保证终止条件尽可能快
+* **简化循环体**：如果有多余的计算，从循环里删除
+* **使用后测试循环**：do-while 这种后测试循环，可以避免终止条件的计算，因此运行更快
+* **展开循环**：如果循环次数是确定的，消除循环并多次使用函数往往更快
+* **避免双重解释**：避免参数为 JavaScript 语句的字符串，因为 JavaScript 解析 JavaScript 会存在双重解释惩罚
+
+#### 最小化语句数
+
+**JavaScript 中语句的数量会影响到执行的速度**。
+
+	var a = 1;
+	var b = 2;
+	var c = 3;
+
+的速度比
+
+	var a = 1,b = 2, c = 3;
+
+要慢得多。
+
+	var name = value[i];
+	i++;
+
+最好也修改为：
+
+	var name = value[i++];
+
+#### 优化 DOM 操作
+
+对于小的 DOM 更改，使用 `createElement()` 和 `appnedChild()` 与使用 `innerHTML` 的效率都差不多。
+
+**如果要多次进行 DOM 的操作，最好是使用一个 documentFragment 先保存所有的更新操作，然后一次添加到 DOM 中，或者构造成一个字符串，然后一次使用 innerHTML 添加到 DOM 中。**
+
+#### 使用事件代理
+
+页面上有过多的事件处理程序，会很大程度上影响页面的响应速度，所以**使用事件冒泡的原理，在祖先节点上使用一个统一的事件处理函数来处理子节点相同的事件**，用以提升效率。
+
+#### 注意类 Array 的 DOM 数据结构
+
+**类 Array 的 DOM 数据结构，如 `HTMLCollection、NodeList、NamedNodeMap`等，无论是访问它的属性还是方法，都是在文档上进行一个查询，开销很昂贵，所以要最小化访问这些数据结构的次数**，如在循环的终止条件中：
+
+	var imgs = document.getElementsByTagName("img"), i,len;
+	len = imgs.length;
+	for(i=0;i<len;i++){...}
+
+使用本地变量保存 length，而不是每次都去访问 imgs 的属性。
+
+### Web Worker
+
+**因为页面加载的过程是一个单线程的过程，所以如果 JavaScript 的计算过于复杂，会导致用户的界面被冻结，所以 Web Worker 让 JavaScript 在后台运行来解决这个问题。**
+
+一般用 Web Worker 运行一个 .js 程序，并且**它所执行的 JavaScript 代码完全在另一个作用域中(worker对象)**，所以最好把长时间、大型、独立的计算放在一个 worker 中执行。
+
+建议使用 Web Worker 的时候，始终使用 onerror 事件处理程序，否则 Worker 会在发生错误时静默失败。
 
 
 
