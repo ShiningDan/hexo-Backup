@@ -5,7 +5,7 @@ categories: coding
 tags:
   - jQuery
 ---
- jQuery笔记
+jQuery笔记
 
 ## jQuery 介绍
 
@@ -64,6 +64,12 @@ jQuery 对象是 jQuery 通过包装 DOM 对象后产生的对象，jQuery 对�
 
 * `is(selector)`：根据选择器、元素或 jQuery 对象来检测匹配元素集合，如果这些元素中至少有一个元素匹配给定的参数，则返回true。
 
+**使用 end() 方法可结束当前链条中的筛选操作，并匹配元素集还原为之前的状态，举例如下：**
+
+	$(this).addClass("selected").siblings().removeClass("selected").end().attr("checked", true);  // end() 返回 $(this)
+
+如果有 `$("option:selected", this)`这种写法的选择器，代表的意思是从一个 小范围的 DOM 对象(`this`) 中选择需要的元素，此时的搜索范围会减小。
+
 ## jQuery 的 DOM 操作
 
 **在 jQuery 中，很多的函数既可以用来获得数据，又可以用来设置数据。**
@@ -96,6 +102,10 @@ jQuery 对象是 jQuery 通过包装 DOM 对象后产生的对象，jQuery 对�
 ### 获取 CSS 样式
 
 **`css()`方法，无论是外部 CSS 导入，还是直接在 HTML 元素里， css() 方法都可以获得属性值。**
+
+### 获取和设置元素的属性
+
+有 `attr()` 函数和 `prop()` 函数可以获得和设置元素的属性，但是这两个函数的使用场景有所不同。`attr()` 函数的返回值是 String，`prop()` 函数的返回值是 true/false。**所以在获取或设置类似于 disable/checked 属性（只添加属性名称就可以生效的属性，或者属性值只存在 true/false 的属性值）的时候，应该使用 `prop()` 函数返回 true/false 而不是使用 `attr()` **。
 
 ### 添加 class
 
@@ -213,23 +223,87 @@ jQuery 不支持事件捕获。
 
 用 `delay()` 方法来对动画进行延迟操作。
 
+如果是对 CSS 样式进行设置，可以使用 `css()` 函数进行设置，也可以使用 `animate()` 函数进行 CSS 样式的修改。**如果使用 animate 函数进行 CSS 效果的修改，此时效果的变化具有一定的缓冲效果**。
+
+## jQuery 表单与表格
+
+jQuery 对于表单有很多现成的选择器，比如 `$("input")`，比如 `$(":checked")`。
+
+`serialize()` 方法和 `serializeArray()` 方法可以将 jQuery  对象序列化为**字符串和 JSON 格式的数据**
+
+## jQuery 与 Ajax
+
+**在 jQuery 中，最底层的方法是 `$.ajax`，第二层的方法是 `load()`、`$.get()` 和 `$.post()`，第三层的方法是 `$.getScript()`和`$.getJSON()`**
+
+### 第一层
+
+`$.ajax()`通过参数来选择进行 Ajax 的细节。
+
+### 第二层
+
+`load()` 方法是用来载入 HTML  文档的，如果没有参数传递，则采用 GET 方式传递，否则，采用 POST 方式传递。
+
+在选择使用 `load()` 函数载入 HTML 页面的时候，可以使用选择器选择需要载入的内容：
+
+	#("#resText").load("test.html .para")
 
 
+`$.get()` 和 `$.post()` 方法都是 jQuery  的全局函数，如果需要传递一些参数给服务器中的页面，可以使用这两个方法。
 
+其中 GET 和 POST 方法有一些区别：
 
+1. GET 请求的参数跟在 URL 后面进行传递，POST 是作为 HTPP 消息的实体内容发送给 Web 服务器。
+2. GET 方法发送的数据有大小限制(不能大于 2KB)，POST 数据流大得多
+3. GET 方法请求的数据会被浏览器缓存起来，所以可以从浏览器历史中获取，会带来严重的安全问题
 
+**`load()`、`$.get()` 和 `$.post()` 方法都可以设置回调函数用来处理返回的内容，但是回调函数的参数不变。**
 
+### 三层
 
+`$.getScript()` 可以动态加载 .js 文件
 
+`$.getJSON()`可以获得 JSON 文件，并且通过回调函数处理得到的 JSON 文件。
 
+`$.each()`方法不同于 jQuery 对象的 `each()`方法，而是一个全局函数。第一个参数是数据，第二个参数是一个回调函数，用来处理该数据。
 
+由于 Ajax 不能跨域，也可以使用 JSONP 形式的回调函数形式，使用`$.getJSON()`函数来加载其他网站的 JSON 数据。
 
+### 全局 Ajax 事件
 
+jQuery 对象有 `ajaxStart()` 和 `ajaxStop()` 方法，当全局中有**任何 Ajax 行为产生或结束的时候被调用。**除此之外还有其他的全局事件如：`ajaxComplete(), ajaxError(), ajaxSend(), ajaxSuccess()`
 
+**如果想使得某个 Ajax 请求不受到全局方法的影响，可以在使用 `$.ajax(option)` 方法时，将参数中的 global 设置为 false**。
 
+### jQuery 插件
 
+jQuery 有很多写好的插件，在[jQuery 插件中心](http://plugins.jquery.com/)可以找到，可以在`<script>`中调用一下，注意`<script>`调用的顺序
 
+常用的有：
 
+* `validation`：表单验证插件(必填、E-mail、URL、信用卡，自定义的验证规则)
+* `form`：可以让 HTML 表单升级成支持 Ajax 传输数据的表单，在点击提交的时候不用刷新页面
+* `SimpleModal`：可以方便实现弹出窗口或遮罩层
+* `cookie`：方便管理网站的 cookie
+* `jQuery UI`：提供常用的鼠标交互效果增强(拖动，放置，选择，排序等)，提供常用的插件(widget，包括手风琴导航，滑块，标签，日历等)，还有增强的动画效果
+
+### jQuery Mobile
+
+jQuery Mobile 是 jQuery 在移动端应用的一个项目，支持响应式设计
+
+### jQuery 性能优化
+
+**多种选择器的性能排序：**使用 ID 定位(调用`getElementById`) > 使用标签定位(调用`getElementsByTagName`) > 使用 class 定位(新浏览器调用`getElementsByClassName`) > 使用属性(有一部分使用`querySelectorAll()`)和伪选择器定位(搜索每一个元素)
+
+注意，多使用**ID选择器，尽量给选择器指定上下文**
+
+**如果要使用伪选择器定位，推荐先使用 ID 选择器定位父元素，然后使用该选择器(通过`find、filter`)，如下：**
+
+	$("#content").find(":hidden")
+	$("a.button").filter(":animated")
+
+在 jQuery 中，for() 和 while() 的速度比 $.each() 快
+
+使用 join() 函数来拼接字符串比使用 `+` 要快
 
 
 
